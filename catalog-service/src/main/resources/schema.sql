@@ -22,3 +22,6 @@ INSERT INTO producto (nombre, precio, descripcion, stock, id_categoria)
 VALUES
     ('Laptop Lenovo IdeaPad 3', 2500.00, 'Laptop de 15 pulgadas con Ryzen 5', 10, 1),
     ('Cafetera Philips Daily', 350.00, 'Cafetera automática 1.2L', 25, 2);
+
+select * from categoria;
+select * from producto;

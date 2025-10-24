@@ -3,10 +3,9 @@ package ia.code.catalog_service.controller;
 import ia.code.catalog_service.entity.Producto;
 import ia.code.catalog_service.usecase.ProductoUseCase;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -16,8 +15,47 @@ public class ProductoController {
 
     private final ProductoUseCase productoUseCase;
 
-    @GetMapping("/{id}")
-    public Mono<Producto> getProductoById(@PathVariable Integer id) {
-        return productoUseCase.getProductoById(id);
+
+    // Obtener un producto por su ID
+    @GetMapping("/{idProducto}")
+    public Mono<ResponseEntity<Producto>> findById(@PathVariable Integer idProducto) {
+        return productoUseCase.findById(idProducto)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
+
+    // Listar todos los productos
+    @GetMapping("/listarProductos")
+    public Flux<Producto> listarProductos() {
+        return productoUseCase.findAll();
+    }
+
+    // Crear un nuevo producto
+    @PostMapping("/crearProducto")
+    public Mono<ResponseEntity<Producto>> crearProducto(@RequestBody Producto producto) {
+        return productoUseCase.save(producto)
+                .map(saved -> ResponseEntity.status(201).body(saved));
+    }
+
+    // Actualizar un producto existente
+    @PutMapping("/actualizarProducto/{idProducto}")
+    public Mono<ResponseEntity<Producto>> actualizarProducto(@PathVariable Integer idProducto, @RequestBody Producto producto) {
+        return productoUseCase.update(idProducto, producto)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    // Eliminar un producto por su ID
+    @DeleteMapping("/eliminarProducto/{idProducto}")
+    public Mono<ResponseEntity<Producto>> eliminarProducto(@PathVariable Integer idProducto) {
+        return productoUseCase.deleteById(idProducto)
+                .then(Mono.just(ResponseEntity.noContent().build()));
+    }
+
+    // Listar productos por ID de categoría
+    @GetMapping("/categoria/{idCategoria}")
+    public Flux<Producto> listarProductosPorCategoria(@PathVariable Integer idCategoria) {
+        return productoUseCase.findByIdCategoria(idCategoria);
+    }
+
 }

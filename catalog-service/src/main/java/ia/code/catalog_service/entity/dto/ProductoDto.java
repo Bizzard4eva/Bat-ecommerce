@@ -1,5 +1,8 @@
 package ia.code.catalog_service.entity.dto;
 
+import lombok.Data;
+
+@Data
 public class ProductoDto {
 
     private Integer id_producto;

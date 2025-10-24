@@ -19,7 +19,11 @@ public class Producto {
     private Double precio;
     private String descripcion;
     private Integer stock;
+
     @Column("id_categoria")
     private Integer idCategoria;
+
+    @Column("id_marca")
+    private Integer idMarca;
 
 }

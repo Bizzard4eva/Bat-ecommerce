@@ -39,6 +39,7 @@ public class ProductoModel implements ProductoUseCase {
             p.setDescripcion(producto.getDescripcion());
             p.setStock(producto.getStock());
             p.setIdCategoria(producto.getIdCategoria());
+            p.setIdMarca(producto.getIdMarca());
             return productoRepository.save(p);
         });
     }

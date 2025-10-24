@@ -1,7 +1,6 @@
 package ia.code.catalog_service.model;
 
 import ia.code.catalog_service.entity.Producto;
-import ia.code.catalog_service.entity.dto.ProductoDto;
 import ia.code.catalog_service.repository.ProductoRepository;
 import ia.code.catalog_service.usecase.ProductoUseCase;
 import lombok.RequiredArgsConstructor;

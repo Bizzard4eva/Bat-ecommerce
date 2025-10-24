@@ -1,6 +1,7 @@
 package ia.code.catalog_service.controller;
 
 import ia.code.catalog_service.entity.Producto;
+import ia.code.catalog_service.entity.dto.ProductoDto;
 import ia.code.catalog_service.usecase.ProductoUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -56,6 +57,20 @@ public class ProductoController {
     @GetMapping("/categoria/{idCategoria}")
     public Flux<Producto> listarProductosPorCategoria(@PathVariable Integer idCategoria) {
         return productoUseCase.findByIdCategoria(idCategoria);
+    }
+
+    // Listar todos los productos con detalles (DTO)
+    // muestra la informacion de la categoria y marca asociada a cada producto
+    @GetMapping("/detalles")
+    public Flux<ProductoDto> listarProductosConDetalles() {
+        return productoUseCase.findAllWithDetailsDto();
+    }
+
+    @GetMapping("/detalles/{idProducto}")
+    public Mono<ResponseEntity<ProductoDto>> listarProductoConDetallesPorId(@PathVariable Integer idProducto) {
+        return productoUseCase.findByIdWithDetailsDto(idProducto)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
 }

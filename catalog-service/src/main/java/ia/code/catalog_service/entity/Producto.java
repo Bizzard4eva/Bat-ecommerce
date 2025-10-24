@@ -14,7 +14,8 @@ import org.springframework.data.relational.core.mapping.Table;
 public class Producto {
 
     @Id
-    private Integer id_producto;
+    @Column("id_producto")
+    private Integer id;
     private String nombre;
     private Double precio;
     private String descripcion;

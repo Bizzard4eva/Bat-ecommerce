@@ -76,3 +76,10 @@ from categoria;
 
 select *
 from producto;
+
+SELECT p.nombre AS producto,
+       c.nombre AS categoria,
+       m.nombre AS marca
+FROM producto p
+INNER JOIN categoria c ON p.id_categoria = c.id_categoria
+INNER JOIN marca m ON p.id_marca = m.id_marca;

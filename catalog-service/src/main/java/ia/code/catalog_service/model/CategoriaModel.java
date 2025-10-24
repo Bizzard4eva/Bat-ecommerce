@@ -30,10 +30,11 @@ public class CategoriaModel implements CategoriaUseCase {
 
     @Override
     public Mono<Categoria> update(Integer id, Categoria categoria) {
-        return categoriaRepository.findById(id).flatMap(c -> {
-            c.setNombre(categoria.getNombre());
-            return categoriaRepository.save(c);
-        });
+        return categoriaRepository.findById(id)
+                .flatMap(c -> {
+                    c.setNombre(categoria.getNombre());
+                    return categoriaRepository.save(c);
+                });
     }
 
     @Override

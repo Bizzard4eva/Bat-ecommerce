@@ -47,6 +47,6 @@ public class CategoriaController {
     @DeleteMapping("/eliminarCategoria/{idCategoria}")
     public Mono<ResponseEntity<Categoria>> eliminarCategoria(@PathVariable Integer idCategoria) {
         return categoriaUseCase.deleteById(idCategoria)
-                .then(Mono.just(ResponseEntity.ok().build()));
+                .then(Mono.just(ResponseEntity.noContent().build()));
     }
 }

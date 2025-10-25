@@ -1,6 +1,5 @@
 package ia.code.order_service.controller;
 
-import ia.code.order_service.entity.Pedido;
 import ia.code.order_service.entity.dto.PedidoRequest;
 import ia.code.order_service.entity.dto.PedidoResponse;
 import ia.code.order_service.usecase.PedidoUseCase;
@@ -24,9 +23,8 @@ public class PedidoController {
         return pedidoUseCase.createPedido(pedidoRequest)
                 .map(ResponseEntity::ok)
                 .onErrorResume(e -> {
-                    e.printStackTrace(); // 👈 muestra el error real
+                    e.printStackTrace();
                     return Mono.just(ResponseEntity.badRequest().build());
                 });
     }
-
 }

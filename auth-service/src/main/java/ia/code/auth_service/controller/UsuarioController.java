@@ -1,8 +1,6 @@
 package ia.code.auth_service.controller;
 
 import ia.code.auth_service.entity.Usuario;
-import ia.code.auth_service.entity.dto.UsuarioDto;
-import ia.code.auth_service.model.UsuarioModel;
 import ia.code.auth_service.usecase.UsuarioUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +19,11 @@ public class UsuarioController {
         return usuarioUseCase.getUsuarioDto(nombre)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}")
+    public Usuario getUsuario(@PathVariable Integer id) {
+        return usuarioUseCase.getUsuario(id);
     }
 
     @PostMapping

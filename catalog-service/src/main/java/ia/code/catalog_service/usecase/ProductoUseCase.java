@@ -20,6 +20,6 @@ public interface ProductoUseCase {
 
     // DTO method
     Flux<ProductoDto> findAllWithDetailsDto();
-    Mono<ProductoDto> findByIdWithDetailsDto(Integer idProducto);
 
+    Mono<ProductoDto> findByIdWithDetailsDto(Integer idProducto);
 }

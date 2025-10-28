@@ -59,6 +59,8 @@ public class ProductoController {
         return productoUseCase.findByIdCategoria(idCategoria);
     }
 
+    // Metodos con DTO
+
     // Listar todos los productos con detalles (DTO)
     // muestra la informacion de la categoria y marca asociada a cada producto
     @GetMapping("/detalles")

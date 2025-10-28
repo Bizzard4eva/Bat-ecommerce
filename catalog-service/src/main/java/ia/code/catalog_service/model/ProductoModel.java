@@ -43,6 +43,7 @@ public class ProductoModel implements ProductoUseCase {
             p.setStock(producto.getStock());
             p.setIdCategoria(producto.getIdCategoria());
             p.setIdMarca(producto.getIdMarca());
+            p.setIdImg(producto.getIdImg());
             return productoRepository.save(p);
         });
     }
@@ -61,15 +62,21 @@ public class ProductoModel implements ProductoUseCase {
 
     @Override
     public Flux<ProductoDto> findAllWithDetailsDto() {
-                String sql = """
-            SELECT p.id_producto, p.nombre, p.precio, p.descripcion,
-                   c.nombre AS nombre_categoria,
-                   m.nombre AS nombre_marca
-            FROM producto p
-            INNER JOIN categoria c ON p.id_categoria = c.id_categoria
-            INNER JOIN marca m ON p.id_marca = m.id_marca
-            ORDER BY p.id_producto ASC
-        """;
+        String sql = """
+                     SELECT\s
+                     p.id_producto,
+                     p.nombre,
+                     p.precio,
+                     p.descripcion,
+                     c.nombre AS nombre_categoria,
+                     m.nombre AS nombre_marca,
+                     i.url AS url_imagen
+                     FROM producto p
+                     INNER JOIN categoria c ON p.id_categoria = c.id_categoria
+                     INNER JOIN marca m ON p.id_marca = m.id_marca
+                     LEFT JOIN image i ON p.id_img = i.id_img
+                     ORDER BY p.id_producto ASC
+                """;
 
         return databaseClient.sql(sql)
                 .map((row, meta) -> {
@@ -80,6 +87,7 @@ public class ProductoModel implements ProductoUseCase {
                     dto.setDescripcion(row.get("descripcion", String.class));
                     dto.setNombreCategoria(row.get("nombre_categoria", String.class));
                     dto.setNombreMarca(row.get("nombre_marca", String.class));
+                    dto.setUrlImagen(row.get("url_imagen", String.class));
                     return dto;
                 })
                 .all();
@@ -89,25 +97,27 @@ public class ProductoModel implements ProductoUseCase {
     @Override
     public Mono<ProductoDto> findByIdWithDetailsDto(Integer idProducto) {
         return databaseClient.sql("""
-            SELECT p.id_producto, p.nombre, p.precio, p.descripcion,
-                   c.nombre AS nombre_categoria,
-                   m.nombre AS nombre_marca
-            FROM producto p
-            INNER JOIN categoria c ON p.id_categoria = c.id_categoria
-            INNER JOIN marca m ON p.id_marca = m.id_marca
-            WHERE p.id_producto = $1
-            """)
-            .bind(0, idProducto)  // bind por índice
-            .map((row, metadata) -> new ProductoDto(
-                    row.get("id_producto", Integer.class),
-                    row.get("nombre", String.class),
-                    row.get("precio", Double.class),
-                    row.get("descripcion", String.class),
-                    row.get("nombre_categoria", String.class),
-                    row.get("nombre_marca", String.class)
-            ))
-            .one();
+                        
+                                    SELECT p.id_producto, p.nombre, p.precio, p.descripcion,
+                                           c.nombre AS nombre_categoria,
+                                           m.nombre AS nombre_marca,
+                                           i.url AS url_imagen
+                                    FROM producto p
+                                    INNER JOIN categoria c ON p.id_categoria = c.id_categoria
+                                    INNER JOIN marca m ON p.id_marca = m.id_marca
+                                    LEFT JOIN image i ON p.id_img = i.id_img
+                                    WHERE p.id_producto = $1
+                        """)
+                .bind(0, idProducto)  // bind por índice
+                .map((row, metadata) -> new ProductoDto(
+                        row.get("id_producto", Integer.class),
+                        row.get("nombre", String.class),
+                        row.get("precio", Double.class),
+                        row.get("descripcion", String.class),
+                        row.get("nombre_categoria", String.class),
+                        row.get("nombre_marca", String.class),
+                        row.get("url_imagen", String.class)
+                ))
+                .one();
     }
-
-
 }

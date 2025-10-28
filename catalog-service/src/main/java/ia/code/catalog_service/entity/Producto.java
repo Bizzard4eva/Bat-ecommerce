@@ -27,4 +27,7 @@ public class Producto {
     @Column("id_marca")
     private Integer idMarca;
 
+    @Column("id_img")
+    private Integer idImg;
+
 }

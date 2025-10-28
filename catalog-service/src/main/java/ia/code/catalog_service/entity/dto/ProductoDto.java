@@ -15,4 +15,5 @@ public class ProductoDto {
     private String descripcion;
     private String nombreCategoria;
     private String nombreMarca;
+    private String urlImagen;
 }

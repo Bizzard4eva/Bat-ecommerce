@@ -7,7 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AgregarItemRequest {
+public class CartItemResponse {
+    private Integer idItem;
     private Integer idProducto;
+    private String nombreProducto;
+    private Double precio;
     private Integer cantidad;
+    private Double subtotal;
 }

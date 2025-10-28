@@ -10,11 +10,11 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CarritoDto {
-    private Integer id_carrito;
+public class CartResponse {
+    private Integer idCart;
     private Integer idUsuario;
     private LocalDateTime fechaCreacion;
     private LocalDateTime fechaActualizacion;
+    private List<CartItemResponse> items;
     private Double total;
-    private List<ItemCarritoDto> items;
 }

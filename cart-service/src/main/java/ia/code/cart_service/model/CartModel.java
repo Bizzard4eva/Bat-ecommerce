@@ -98,7 +98,7 @@ public class CartModel implements CartUseCase {
     // Crea un nuevo carrito para el usuario dado
     private Mono<Cart> createNewCart(Integer userId) {
         Cart newCart = Cart.builder()
-                .id_usuario(userId)
+                .idUsuario(userId)
                 .fecha_creacion(LocalDateTime.now())
                 .fecha_actualizacion(LocalDateTime.now())
                 .build();
@@ -110,10 +110,10 @@ public class CartModel implements CartUseCase {
         return getProductoById(productId)
                 .flatMap(producto -> {
                     CartItem newItem = new CartItem();
-                    newItem.setId_cart(cartId);
-                    newItem.setId_producto(productId);
+                    newItem.setIdCart(cartId);
+                    newItem.setIdProducto(productId);
                     newItem.setCantidad(cantidad);
-                    newItem.setPrecio_unitario(producto.getPrecio());
+                    newItem.setPrecioUnitario(producto.getPrecio());
                     newItem.setSubtotal(producto.getPrecio() * cantidad);
                     return cartItemRepository.save(newItem);
                 });
@@ -121,9 +121,9 @@ public class CartModel implements CartUseCase {
 
     // Actualiza el precio unitario y subtotal del item del carrito basado en el precio actual del producto
     private Mono<CartItem> updateCartItemWithProductPrice(CartItem cartItem) {
-        return getProductoById(cartItem.getId_producto())
+        return getProductoById(cartItem.getIdCart())
                 .map(producto -> {
-                    cartItem.setPrecio_unitario(producto.getPrecio());
+                    cartItem.setPrecioUnitario(producto.getPrecio());
                     cartItem.setSubtotal(producto.getPrecio() * cartItem.getCantidad());
                     return cartItem;
                 });
@@ -145,14 +145,14 @@ public class CartModel implements CartUseCase {
                         .collectList()
                         .flatMap(items -> {
                             if (items.isEmpty()) {
-                                return Mono.just(new CartResponse(cart.getId_cart(), cart.getId_usuario(),
+                                return Mono.just(new CartResponse(cart.getId_cart(), cart.getIdUsuario(),
                                         cart.getFecha_creacion(), cart.getFecha_actualizacion(), List.of(), 0.0));
                             }
                             return Flux.fromIterable(items)
-                                    .flatMap(item -> getProductoById(item.getId_producto())
+                                    .flatMap(item -> getProductoById(item.getIdProducto())
                                             .map(producto -> {
                                                 Double subtotal = producto.getPrecio() * item.getCantidad();
-                                                return new CartItemResponse(item.getId_item(), item.getId_producto(),
+                                                return new CartItemResponse(item.getId_item(), item.getIdProducto(),
                                                         producto.getNombre(), producto.getPrecio(),
                                                         item.getCantidad(), subtotal);
                                             }))
@@ -161,7 +161,7 @@ public class CartModel implements CartUseCase {
                                         Double total = itemResponses.stream()
                                                 .mapToDouble(CartItemResponse::getSubtotal)
                                                 .sum();
-                                        return new CartResponse(cart.getId_cart(), cart.getId_usuario(),
+                                        return new CartResponse(cart.getId_cart(), cart.getIdUsuario(),
                                                 cart.getFecha_creacion(), cart.getFecha_actualizacion(),
                                                 itemResponses, total);
                                     });

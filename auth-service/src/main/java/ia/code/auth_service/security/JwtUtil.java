@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
@@ -20,34 +21,23 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private long expirationMs;
 
-    private Key getSignKey() { return Keys.hmacShaKeyFor(secret.getBytes()); }
+    private Key getSignKey() {  return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)); }
 
     public String generateToken(String username, String role, Integer userId) {
         return Jwts.builder()
                 .setSubject(username)
-                .claim("role", role)
                 .claim("id", userId)
+                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
-
     public Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-    }
-
-    public boolean isTokenValid(String token) {
-        try {
-            extractAllClaims(token);
-            return true;
-        } catch (JwtException e) {
-            System.out.println("Token Inválido: " + e.getMessage());
-            return false;
-        }
     }
 }

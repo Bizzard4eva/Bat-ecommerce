@@ -37,7 +37,8 @@ public class CategoriaController {
 
     // Actualizar una categoría existente
     @PutMapping("/actualizarCategoria/{idCategoria}")
-    public Mono<ResponseEntity<Categoria>> actualizarCategoria(@PathVariable Integer idCategoria, @RequestBody Categoria categoria) {
+    public Mono<ResponseEntity<Categoria>> actualizarCategoria(@PathVariable Integer idCategoria,
+                                                               @RequestBody Categoria categoria) {
         return categoriaUseCase.update(idCategoria, categoria)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());

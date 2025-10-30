@@ -15,7 +15,8 @@ public class CartController {
     private final CartUseCase cartUseCase;
 
     @PostMapping("/agregar")
-    public Mono<ResponseEntity<CartResponse>> addItemToCart(@RequestBody CartRequest cartRequest) {
+    public Mono<ResponseEntity<CartResponse>> addItemToCart(@RequestHeader("X-User-Id") Integer idUsuario, @RequestBody CartRequest cartRequest) {
+        cartRequest.setIdUsuario(idUsuario);
         return cartUseCase.addItemToCart(cartRequest)
                 .map(ResponseEntity::ok)
                 .onErrorResume(e -> {
@@ -25,7 +26,14 @@ public class CartController {
     }
 
     @GetMapping("/usuario/{userId}")
-    public Mono<ResponseEntity<CartResponse>> getCartByUserId(@PathVariable Integer userId) {
+    public Mono<ResponseEntity<CartResponse>> getCart(@PathVariable Integer userId) {
+        return cartUseCase.getCartByUserId(userId)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/usuario")
+    public Mono<ResponseEntity<CartResponse>> getCartByUserId(@RequestHeader("X-User-Id") Integer userId) {
         return cartUseCase.getCartByUserId(userId)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());

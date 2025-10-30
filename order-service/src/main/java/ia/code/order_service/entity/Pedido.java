@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
@@ -17,8 +18,11 @@ import java.time.LocalDateTime;
 public class Pedido {
 
     @Id
-    private Integer id_pedido;
-    private Integer id_usuario;
+    @Column("id_pedido")
+    private Integer idPedido;
+    @Column("id_usuario")
+    private Integer idUsuario;
     private Double total;
     private LocalDateTime fecha;
+    private String estado;
 }

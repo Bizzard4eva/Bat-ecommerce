@@ -13,9 +13,9 @@ import org.springframework.data.relational.core.mapping.Table;
 public class DetallePedido {
 
     @Id
-    private Integer id_detalle;
-    private Integer id_pedido;
-    private Integer id_producto;
+    private Integer idDetalle;
+    private Integer idPedido;
+    private Integer idProducto;
     private Integer cantidad;
     private Double subtotal;
 }

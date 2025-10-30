@@ -17,5 +17,6 @@ public class PedidoResponse {
     private Integer idUsuario;
     private Double total;
     private LocalDateTime fecha;
-    private List<DetallePedido> detalles;
+    private String estado;
+    private List<DetallePedidoResponse> detalles;
 }

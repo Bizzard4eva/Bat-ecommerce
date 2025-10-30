@@ -10,15 +10,8 @@ public class WebClientConfiguration {
 
 
     @Bean
-    @LoadBalanced
-    WebClient.Builder loadBalancedWebClientBuilder() {
-        return WebClient.builder();
-    }
-
-    @Bean
-    WebClient webClient(WebClient.Builder builder) {
-        return builder
-                .baseUrl("http://catalog-service")
+    public WebClient webClient(WebClient.Builder builder) {
+        return builder.baseUrl("http://localhost:8083")
                 .build();
     }
 }

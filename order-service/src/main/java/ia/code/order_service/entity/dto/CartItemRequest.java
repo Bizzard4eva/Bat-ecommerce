@@ -5,10 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class DetallePedidoRequest {
-    private Integer id_producto;
+@NoArgsConstructor
+public class CartItemRequest {
+    private Integer idItem;
+    private Integer idProducto;
+    private String nombreProducto;
+    private Double precio;
     private Integer cantidad;
     private Double subtotal;
 }

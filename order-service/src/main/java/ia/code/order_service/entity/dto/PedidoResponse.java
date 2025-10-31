@@ -1,6 +1,5 @@
 package ia.code.order_service.entity.dto;
 
-import ia.code.order_service.entity.DetallePedido;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

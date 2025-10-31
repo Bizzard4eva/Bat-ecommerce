@@ -1,18 +1,14 @@
 package ia.code.order_service.controller;
 
-import ia.code.order_service.entity.Pedido;
-import ia.code.order_service.entity.dto.EstadoPedidoRequest;
-import ia.code.order_service.entity.dto.PedidoRequest;
 import ia.code.order_service.entity.dto.PedidoResponse;
 import ia.code.order_service.service.PedidoService;
-import ia.code.order_service.usecase.PedidoUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/pedidos")
@@ -21,44 +17,42 @@ public class PedidoController {
 
     private final PedidoService pedidoService;
 
-    // Crear pedido
-    @PostMapping
+    @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<PedidoResponse> crearPedido(@RequestHeader("X-User-Id") Integer id,
-            @RequestBody PedidoRequest pedidoRequest) {  //
-        return pedidoService.crearPedido(id, pedidoRequest);
+    public Mono<PedidoResponse> crearPedido(@RequestHeader("X-User-Id") Integer idUsuario) {
+        return pedidoService.crearPedido(idUsuario);
     }
 
-    // Listar pedidos del usuario
     @GetMapping
     public Flux<PedidoResponse> listarPedidosUsuario(@RequestHeader("X-User-Id") Integer idUsuario) {
         return pedidoService.listarPedidosPorUsuario(idUsuario);
     }
 
-    // 3️⃣ Obtener pedido por ID
-    @GetMapping("/{id_pedido}")
-    public Mono<PedidoResponse> obtenerPedidoPorId(@PathVariable Integer id_pedido) {
-        return pedidoService.obtenerPedidoPorId(id_pedido);
-    }
-
-    // 4️⃣ Listar todos los pedidos (admin)
-    @GetMapping("/todos")
+    @GetMapping("/all")
     public Flux<PedidoResponse> listarTodosLosPedidos(@RequestHeader("X-User-Id") Integer idUsuario) {
-        if (idUsuario != 1) { // solo el usuario 1 puede ser admin
-            return Flux.error(new RuntimeException("No autorizado"));
+        // Validación simple de admin (usuario 1)
+        if (!idUsuario.equals(1)) {
+            return Flux.error(new RuntimeException("No autorizado: Solo administradores pueden ver todos los pedidos"));
         }
         return pedidoService.listarTodosLosPedidos();
     }
 
-    // 5️⃣ Actualizar estado de un pedido (admin)
-    @PutMapping("/{idPedido}/estado")
-    public Mono<PedidoResponse> actualizarEstado(@PathVariable Integer idPedido,
-                                                 @RequestBody EstadoPedidoRequest estadoRequest,
-                                                 @RequestHeader("X-User-Id") Integer idUsuario) {
-        // Solo el admin (por ejemplo, id 1) puede actualizar
-        if (idUsuario != 1) {
-            return Mono.error(new RuntimeException("No autorizado"));
+    @PutMapping("/{idPedido}/status")
+    public Mono<PedidoResponse> actualizarEstado(
+            @PathVariable Integer idPedido,
+            @RequestBody Map<String, String> estadoRequest,
+            @RequestHeader("X-User-Id") Integer idUsuario) {
+
+        // Validación de admin
+        if (!idUsuario.equals(1)) {
+            return Mono.error(new RuntimeException("No autorizado: Solo administradores pueden actualizar estados"));
         }
-        return pedidoService.actualizarEstadoPedido(idPedido, estadoRequest);
+
+        String nuevoEstado = estadoRequest.get("estado");
+        if (nuevoEstado == null || nuevoEstado.trim().isEmpty()) {
+            return Mono.error(new RuntimeException("El campo 'estado' es requerido"));
+        }
+
+        return pedidoService.actualizarEstadoPedido(idPedido, nuevoEstado);
     }
 }

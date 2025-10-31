@@ -1,4 +1,4 @@
-package ia.code.cart_service.entity.dto;
+package ia.code.order_service.entity.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,11 +10,11 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CartResponse {
+public class CartRequest {
     private Integer idCart;
     private Integer idUsuario;
     private LocalDateTime fechaCreacion;
     private LocalDateTime fechaActualizacion;
-    private List<CartItemResponse> items;
+    private List<CartItemRequest> items;
     private Double total;
 }

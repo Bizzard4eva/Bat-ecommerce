@@ -1,23 +1,22 @@
 package ia.code.order_service.service;
 
-import ia.code.order_service.configuration.MapperConfiguration;
+import ia.code.order_service.entity.DetallePedido;
 import ia.code.order_service.entity.Pedido;
-import ia.code.order_service.entity.dto.EstadoPedidoRequest;
-import ia.code.order_service.entity.dto.PedidoRequest;
-import ia.code.order_service.entity.dto.PedidoResponse;
-import ia.code.order_service.entity.dto.DetallePedidoResponse;
+import ia.code.order_service.entity.dto.*;
 import ia.code.order_service.repository.DetallePedidoRepository;
 import ia.code.order_service.repository.PedidoRepository;
 import ia.code.order_service.usecase.PedidoUseCase;
-import jakarta.ws.rs.core.HttpHeaders;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -25,67 +24,118 @@ import java.util.List;
 public class PedidoService implements PedidoUseCase {
 
     private final PedidoRepository pedidoRepository;
-    private final WebClient webClient; // se inyecta desde tu WebClientConfiguration
+    private final DetallePedidoRepository detallePedidoRepository;
+    private final WebClient webClient;
+    private final ModelMapper modelMapper;
 
-    private static final String CART_SERVICE_ENDPOINT = "/carrito/usuario/{productId}";
+    private static final String CART_SERVICE_ENDPOINT = "/carrito/usuario/{userId}";
+
 
     @Override
-    public Mono<PedidoResponse> crearPedido(Integer idUsuario,PedidoRequest pedidoRequest) {
-
-        // Obtener detalles del carrito desde cart-service con token
+    public Mono<PedidoResponse> crearPedido(Integer idUsuario) {
         return webClient.get()
                 .uri(CART_SERVICE_ENDPOINT, idUsuario)
+                .header("X-User-Id", idUsuario.toString())
                 .retrieve()
-                .bodyToFlux(DetallePedidoResponse.class)
-                .collectList()
-                .flatMap(detalles -> {
-                    if (detalles == null || detalles.isEmpty()) {
+                .onStatus(status -> status.is4xxClientError(), response ->
+                        Mono.error(new RuntimeException("Carrito no encontrado para el usuario auntenticado: " + idUsuario))
+                )
+                .onStatus(status -> status.is5xxServerError(), response ->
+                                Mono.error(new RuntimeException("Error en cart-service"))
+                        )
+                .bodyToMono(CartRequest.class)
+                .flatMap(cartRequest -> {
+                    // Validar que el carrito tenga items
+                    if (cartRequest.getItems() == null || cartRequest.getItems().isEmpty()) {
                         return Mono.error(new RuntimeException("El carrito está vacío"));
                     }
-
-                    double total = detalles.stream()
-                            .mapToDouble(d -> d.getSubtotal() != null ? d.getSubtotal() : 0)
-                            .sum();
-
-                    Pedido pedido = MapperConfiguration.toEntity(pedidoRequest);
+                    // Se crea el pedido
+                    Pedido pedido = new Pedido();
                     pedido.setIdUsuario(idUsuario);
-                    pedido.setTotal(total);
+                    pedido.setFecha(LocalDateTime.now());
+                    pedido.setTotal(cartRequest.getTotal());
+                    pedido.setEstado("PENDIENTE");
 
+                    // Guardamos el pedido con los detalles
                     return pedidoRepository.save(pedido)
-                            .map(saved -> {
-                                PedidoResponse response = MapperConfiguration.toResponse(saved);
-                                response.setDetalles(detalles);
-                                return response;
+                            .flatMap(savedPedido -> {
+                                // Creamos los detalles del pedido desde los detalles del carrito
+                                List<DetallePedido> detalles = cartRequest.getItems().stream()
+                                        .map(item -> {
+                                            DetallePedido detalle = new DetallePedido();
+                                            detalle.setIdProducto(item.getIdProducto());
+                                            detalle.setNombreProducto(item.getNombreProducto());
+                                            detalle.setCantidad(item.getCantidad());
+                                            detalle.setSubtotal(item.getSubtotal());
+                                            return detalle;
+                                                })
+                                        .peek(detalle -> detalle.setIdPedido(savedPedido.getIdPedido()))
+                                        .collect(Collectors.toList());
+
+                                // Guardamos los detalles
+                                return detallePedidoRepository.saveAll(detalles)
+                                        .collectList()
+                                        .map(savedDetalles -> {
+                                            //Contruimos la respuesta
+                                            PedidoResponse response = modelMapper.map(savedPedido, PedidoResponse.class);
+                                            response.setDetalles(mapToDetalleResponse(savedDetalles));
+                                            return response;
+                                        });
                             });
+
                 });
+    }
+
+    private List<DetallePedidoResponse> mapToDetalleResponse(List<DetallePedido> detalles) {
+        return  detalles.stream()
+                .map(detalle -> {
+                    DetallePedidoResponse response = new DetallePedidoResponse();
+                    response.setIdProducto(detalle.getIdProducto());
+                    response.setNombreProducto(detalle.getNombreProducto());
+                    response.setCantidad(detalle.getCantidad());
+                    response.setPrecioUnitario(detalle.getSubtotal() / detalle.getCantidad());
+                    response.setSubtotal(detalle.getSubtotal());
+                    return response;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
     public Flux<PedidoResponse> listarPedidosPorUsuario(Integer idUsuario) {
         return pedidoRepository.findByIdUsuario(idUsuario)
-                .map(MapperConfiguration::toResponse);
+                .flatMap(this::construirPedidoResponseConDetalles);
+    }
+
+    private Mono<PedidoResponse> construirPedidoResponseConDetalles(Pedido pedido) {
+        return detallePedidoRepository.findByIdPedido(pedido.getIdPedido())
+                .collectList()
+                .map(detalles -> {
+                    PedidoResponse response = modelMapper.map(pedido, PedidoResponse.class);
+                    response.setDetalles(mapToDetalleResponse(detalles));
+                    return response;
+                });
     }
 
     @Override
     public Mono<PedidoResponse> obtenerPedidoPorId(Integer idPedido) {
         return pedidoRepository.findById(idPedido)
-                .map(MapperConfiguration::toResponse);
+                .flatMap(this::construirPedidoResponseConDetalles);
     }
 
     @Override
     public Flux<PedidoResponse> listarTodosLosPedidos() {
         return pedidoRepository.findAll()
-                .map(MapperConfiguration::toResponse);
+                .flatMap(this::construirPedidoResponseConDetalles);
     }
 
     @Override
-    public Mono<PedidoResponse> actualizarEstadoPedido(Integer idPedido, EstadoPedidoRequest estadoRequest) {
+    public Mono<PedidoResponse> actualizarEstadoPedido(Integer idPedido, String estado) {
         return pedidoRepository.findById(idPedido)
                 .flatMap(pedido -> {
-                    pedido.setEstado(estadoRequest.getEstado());
+                    pedido.setEstado(estado);
                     return pedidoRepository.save(pedido);
                 })
-                .map(MapperConfiguration::toResponse);
+                .flatMap(this::construirPedidoResponseConDetalles);
     }
 }
 

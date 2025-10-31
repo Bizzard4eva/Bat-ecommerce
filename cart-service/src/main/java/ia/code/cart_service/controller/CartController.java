@@ -15,8 +15,13 @@ public class CartController {
     private final CartUseCase cartUseCase;
 
     @PostMapping("/agregar")
-    public Mono<ResponseEntity<CartResponse>> addItemToCart(@RequestHeader("X-User-Id") Integer idUsuario, @RequestBody CartRequest cartRequest) {
-        cartRequest.setIdUsuario(idUsuario);
+    public Mono<ResponseEntity<CartResponse>> addItemToCart(
+            @RequestHeader(value = "X-User-Id", required = false) Integer idUsuarioHeader,
+            @RequestBody CartRequest cartRequest) {
+
+        Integer finalUserId = (idUsuarioHeader != null) ? idUsuarioHeader : cartRequest.getIdUsuario();
+        if (finalUserId == null) { return Mono.just(ResponseEntity.badRequest().build()); }
+        cartRequest.setIdUsuario(finalUserId);
         return cartUseCase.addItemToCart(cartRequest)
                 .map(ResponseEntity::ok)
                 .onErrorResume(e -> {
@@ -25,26 +30,33 @@ public class CartController {
                 });
     }
 
-    @GetMapping("/usuario/{userId}")
-    public Mono<ResponseEntity<CartResponse>> getCart(@PathVariable Integer userId) {
-        return cartUseCase.getCartByUserId(userId)
+    @GetMapping({"/usuario/{userId}", "/usuario"})
+    public Mono<ResponseEntity<CartResponse>> getCartByUserId(
+            @RequestHeader(value = "X-User-Id", required = false) Integer idUsuarioHeader,
+            @PathVariable(required = false) Integer userId) {
+
+        Integer finalUserId = (idUsuarioHeader != null) ? idUsuarioHeader : userId;
+        if (finalUserId == null) { return Mono.just(ResponseEntity.badRequest().build()); }
+
+        return cartUseCase.getCartByUserId(finalUserId)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/usuario")
-    public Mono<ResponseEntity<CartResponse>> getCartByUserId(@RequestHeader("X-User-Id") Integer userId) {
-        return cartUseCase.getCartByUserId(userId)
+    @DeleteMapping("/producto/{productId}")
+    public Mono<ResponseEntity<CartResponse>> removeItemFromCart(
+            @RequestHeader(value = "X-User-Id", required = false) Integer idUsuarioHeader,
+            @RequestParam(value = "userId", required = false) Integer idUsuarioParam,
+            @PathVariable Integer productId) {
+
+        Integer finalUserId = (idUsuarioHeader != null) ? idUsuarioHeader : idUsuarioParam;
+        if (finalUserId == null) { return Mono.just(ResponseEntity.badRequest().build()); }
+
+        return cartUseCase.removeItemFromCart(finalUserId, productId)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/usuario/{userId}/producto/{productId}")
-    public Mono<ResponseEntity<CartResponse>> removeItemFromCart(@PathVariable Integer userId, @PathVariable Integer productId) {
-        return cartUseCase.removeItemFromCart(userId, productId)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
 
     @PutMapping("/actualizar")
     public Mono<ResponseEntity<CartResponse>> updateItemQuantity(@RequestBody CartRequest cartRequest) {
@@ -56,9 +68,11 @@ public class CartController {
                 });
     }
 
-    @DeleteMapping("/usuario/{userId}/limpiar")
-    public Mono<ResponseEntity<Void>> clearCart(@PathVariable Integer userId) {
+
+    @DeleteMapping("/limpiar")
+    public Mono<ResponseEntity<Void>> clearCart(@RequestHeader("X-User-Id") Integer userId) {
         return cartUseCase.clearCart(userId)
                 .then(Mono.just(ResponseEntity.noContent().build()));
     }
+
 }

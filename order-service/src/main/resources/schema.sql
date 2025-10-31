@@ -1,5 +1,5 @@
 
-CREATE DATABASE ordenes;
+CREATE DATABASE pedidos;
 
 CREATE TABLE IF NOT EXISTS pedido (
     id_pedido SERIAL PRIMARY KEY,
@@ -13,7 +13,9 @@ CREATE TABLE IF NOT EXISTS detalle_pedido (
     id_detalle SERIAL PRIMARY KEY,
     id_pedido INT REFERENCES pedido(id_pedido),
     id_producto INT NOT NULL,
+    nombre_producto VARCHAR(45) NOT NULL,
     cantidad INT NOT NULL,
-    subtotal DECIMAL(10,2)
+    subtotal DECIMAL(10,2),
+    FOREIGN KEY (id_pedido) REFERENCES pedido(id_pedido)
 );
 

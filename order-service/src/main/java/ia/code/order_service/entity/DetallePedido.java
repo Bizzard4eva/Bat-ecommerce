@@ -20,6 +20,7 @@ public class DetallePedido {
     private Integer idPedido;
     @Column("id_producto")
     private Integer idProducto;
+    @Column("nombre_producto")
     private String nombreProducto;
     private Integer cantidad;
     private Double subtotal;

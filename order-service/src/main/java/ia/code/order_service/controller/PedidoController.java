@@ -11,13 +11,13 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/pedidos")
+@RequestMapping("/orders")
 @RequiredArgsConstructor
 public class PedidoController {
 
     private final PedidoService pedidoService;
 
-    @PostMapping("/create")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<PedidoResponse> crearPedido(@RequestHeader("X-User-Id") Integer idUsuario) {
         return pedidoService.crearPedido(idUsuario);

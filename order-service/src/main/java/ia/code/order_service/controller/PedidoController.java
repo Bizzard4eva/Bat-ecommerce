@@ -4,6 +4,7 @@ import ia.code.order_service.entity.dto.PedidoResponse;
 import ia.code.order_service.service.PedidoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -35,6 +36,17 @@ public class PedidoController {
             return Flux.error(new RuntimeException("No autorizado: Solo administradores pueden ver todos los pedidos"));
         }
         return pedidoService.listarTodosLosPedidos();
+    }
+
+    @PutMapping("/internal/{idPedido}/status")
+    public ResponseEntity<Void> actualizarEstadoInterno(
+            @PathVariable Integer idPedido,
+            @RequestBody Map<String, String> estadoRequest) {
+
+        String nuevoEstado = estadoRequest.get("estado");
+        pedidoService.actualizarEstadoPedido(idPedido, nuevoEstado).block();
+
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{idPedido}/status")

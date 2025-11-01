@@ -21,7 +21,14 @@ public class JwtAuthFilter implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
+        String method = exchange.getRequest().getMethod().name();
+
         System.out.println("🚀 GATEWAY - Processing: " + path);
+
+        if(method.equals("OPTIONS")){
+            System.out.println("✅ GATEWAY - CORS Preflight request, allowing: " + path);
+            return chain.filter(exchange);
+        }
 
         if (path.contains("/auth/login") || path.contains("/auth/register")) {
             System.out.println("✅ GATEWAY - Public route, skipping: " + path);

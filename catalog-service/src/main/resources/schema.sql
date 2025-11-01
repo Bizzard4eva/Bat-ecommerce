@@ -162,6 +162,49 @@ UPDATE producto SET id_img = 15 WHERE id_producto = 15; -- Nike Metcon 9
 UPDATE producto SET id_img = 16 WHERE id_producto = 16; -- Adidas Copa Sense
 UPDATE producto SET id_img = 17 WHERE id_producto = 17; -- Nike Mercurial Vapor 15
 
+-- Insertar productos
+INSERT INTO producto (nombre, precio, descripcion, stock, id_categoria, id_marca, id_img) VALUES
+-- Running
+('Nike Air Zoom Pegasus 40', 499.90, 'Zapatillas de running ligeras y cómodas con excelente amortiguación.', 25, 1, 1, https://runastore.pe/media/catalog/product/cache/1ad426beaceeac5935cd76675f3d6a1f/d/v/dv3853-100_1.jpg),
+('Adidas Ultraboost Light', 629.00, 'Zapatillas de alto rendimiento con tecnología Boost para máxima energía.', 18, 1, 2, https://m.media-amazon.com/images/I/71hzKt-KuoL._AC_SL1500_.jpg),
+
+-- Basketball
+('Jordan Luka 2', 699.90, 'Diseñadas para el juego rápido, con gran soporte lateral.', 15, 2, 3, https://totalsport.pe/wp-content/uploads/DZ3498-100-1.jpg),
+('Puma All Pro Nitro', 449.00, 'Zapatillas de baloncesto con suela de tracción multidireccional.', 12, 2, 5, https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,e_sharpen:95,w_2000,h_2000/global/379924/01/sv01/fnd/PER/fmt/png/Zapatillas-de-basketball-All-Pro-NITRO%E2%84%A2-unisex),
+
+-- Skateboarding
+('Vans Old Skool Pro', 319.00, 'Modelo clásico reforzado para skaters, con suela waffle.', 30, 3, 7, https://vans.com.pe/cdn/shop/files/VN000D3HY28-HERO.jpg?v=1753832694&width=493),
+('Nike SB Dunk Low', 549.90, 'Zapatillas de skate con diseño icónico y gran agarre.', 20, 3, 1, https://totalsport.pe/wp-content/uploads/FQ7585-200-1.jpg),
+
+-- Lifestyle
+('New Balance 574 Classic', 389.00, 'Estilo retro con comodidad moderna, ideal para el día a día.', 40, 4, 4, https://sparta.pe/wp-content/uploads/ml574evn_2-1.jpg),
+('Adidas Stan Smith', 359.90, 'Clásico atemporal con acabado en cuero y detalles minimalistas.', 35, 4, 2, https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/4edaa6d5b65a40d19f20a7fa00ea641f_9366/Zapatillas_Stan_Smith_Blanco_M20325_01_standard.jpg),
+
+-- Training & Gym
+('Reebok Nano X4', 499.00, 'Diseñadas para entrenamiento funcional y levantamiento de pesas.', 25, 5, 8, https://rimage.ripley.com.pe/home.ripley/Attachment/WOP/1/2084346037546/full_image-2084346037546.jpg),
+('Under Armour Project Rock 6', 569.90, 'Zapatillas de entrenamiento con gran estabilidad y durabilidad.', 15, 5, 9, https://runastore.pe/media/catalog/product/cache/715c0a09f6185a203cf9660960f0d1a6/3/0/3026534-800_1.jpg),
+
+-- Outdoor & Hiking
+('ASICS Gel-Sonoma 7', 429.00, 'Zapatillas de trail con amortiguación y tracción para terrenos difíciles.', 22, 6, 10, https://media.falabella.com/falabellaPE/20676578_1/public),
+('Nike ACG Air Nasu 2', 579.90, 'Zapatillas todoterreno resistentes al agua y de gran agarre.', 10, 6, 1, https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAGrijYXkg6RN93WSVywY7SWNmQzzzOgt-jA&s),
+
+-- Fútbol
+('Adidas Predator Accuracy.3 FG', 449.00, 'Botines para césped natural con ajuste cómodo y precisión al golpear.', 20, 7, 2, https://assets.adidas.com/images/w_600,f_auto,q_auto/2400a061370347378232f0e5681eb250_9366/Chimpunes_Predator_Accuracy.3_Terreno_Firme_Azul_GZ0026_22_model.jpg),
+('Puma Future 7 Ultimate FG/AG', 499.00, 'Botines ligeros con cordones personalizables y control superior.', 18, 7, 5, https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,e_sharpen:95,w_2000,h_2000/global/107599/03/sv01/fnd/PER/fmt/png/FUTURE-7-ULTIMATE-Firm-Ground/Artificial-Ground-Men's-Soccer-Cleats),
+
+-- Sandals & Slides
+('Nike Victori One Slide', 159.90, 'Sandalias ligeras y acolchadas para después del entrenamiento.', 35, 8, 1, https://d3fvqmu2193zmz.cloudfront.net/ProductCatalog/Workspace.CWDQQL6GUIJMS/ProductCatalog.C2GW32EBR2OYS/500x500/C2GXKBJJ2VQMG.jpg),
+('Adidas Adilette Aqua', 139.90, 'Sandalias resistentes al agua con plantilla suave.', 40, 8, 2, https://assets.adidas.com/images/w_600,f_auto,q_auto/cb1316406e584892bdb3a991001bd46d_faec/Sandalias_adilette_Aqua_Negro_F35543_db01_standard.jpg),
+
+-- Golf
+('Under Armour HOVR Drive 2', 729.00, 'Zapatillas de golf con tracción y soporte premium.', 8, 9, 9, https://m.media-amazon.com/images/I/71UIRBsxd8L._UY900_.jpg),
+('Puma Ignite PWRAdapt Caged', 649.90, 'Zapatillas de golf con amortiguación adaptable y gran agarre.', 10, 9, 5, https://m.media-amazon.com/images/I/71AAeb6+6PL._AC_SL1500_.jpg),
+
+-- Tenis
+('ASICS Court FF 3', 589.00, 'Zapatillas de tenis con gran estabilidad y amortiguación.', 12, 10, 10, https://media.falabella.com/falabellaPE/138034130_01/w=800,h=800,fit=pad),
+('NikeCourt Air Zoom Vapor 11', 629.00, 'Diseño ligero y ágil para jugadores rápidos.', 14, 10, 1, https://http2.mlstatic.com/D_NQ_NP_703470-MPE71509680231_092023-O-zapatilla-nike-nikecourt-air-zoom-vapor-11-dr6965800-.webp);
+
+
 
 select *
 from categoria;
